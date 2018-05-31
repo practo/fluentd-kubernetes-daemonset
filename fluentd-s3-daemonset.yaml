@@ -1,37 +1,37 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: fluentd-gcs
-  namespace: kube-system
+  name: fluentd
+  namespace: logging
   labels:
     k8s-app: fluentd-logging
     version: v1
-    #    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: fluentd-logging
         version: v1
-        #        kubernetes.io/cluster-service: "true"
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       containers:
-      - name: fluentd-gcs
-        image: fluent/fluentd-kubernetes-daemonset:gcs
+      - name: fluentd
+        imagePullPolicy: Always
+        image: practodev/fluentd-kubernetes-daemonset:s3-time-tag
         env:
-          - name:  GCS_BUCKET_PROJECT
-            value: "myproject"
-          - name:  GCS_BUCKET_NAME
-            value: "mybucket"
+          - name:  S3_BUCKET_NAME
+            value: "container-logs-staging"
+          - name:  S3_BUCKET_REGION
+            value: "ap-south-1"
         resources:
           limits:
-            memory: 200Mi
+            memory: 300Mi
+            cpu:  200m
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 200m
+            memory: 300Mi
         volumeMounts:
         - name: varlog
           mountPath: /var/log
@@ -39,6 +39,8 @@ spec:
           mountPath: /var/lib/docker/containers
           readOnly: true
       terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+      - name: dev-secret-docker
       volumes:
       - name: varlog
         hostPath:
