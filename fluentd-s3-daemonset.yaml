@@ -19,19 +19,19 @@ spec:
       containers:
       - name: fluentd
         imagePullPolicy: Always
-        image: practodev/fluentd-kubernetes-daemonset:s3-time-tag
+        image: doofenshmirtz/fluentd-kubernetes-daemonset:out-s3
         env:
           - name:  S3_BUCKET_NAME
-            value: "container-logs-staging"
+            value: "replace-with-bucket-name"
           - name:  S3_BUCKET_REGION
-            value: "ap-south-1"
+            value: "us-east-1"
         resources:
           limits:
-            memory: 300Mi
-            cpu:  200m
+            memory: 400Mi
+            cpu:  300m
           requests:
-            cpu: 200m
-            memory: 300Mi
+            cpu: 300m
+            memory: 400Mi
         volumeMounts:
         - name: varlog
           mountPath: /var/log
@@ -39,8 +39,6 @@ spec:
           mountPath: /var/lib/docker/containers
           readOnly: true
       terminationGracePeriodSeconds: 30
-      imagePullSecrets:
-      - name: dev-secret-docker
       volumes:
       - name: varlog
         hostPath:
